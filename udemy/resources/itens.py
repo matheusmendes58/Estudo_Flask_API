@@ -12,7 +12,7 @@ class Item(Resource):
 
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect('data.db')
+        connection = sqlite3.connect('../data.db')
         cursor = connection.cursor()
         query = 'SELECT * FROM items WHERE name=?'
         result = cursor.execute(query, (name,))
@@ -38,7 +38,7 @@ class Item(Resource):
 
     @classmethod
     def insert(cls, item):
-        connection = sqlite3.connect('data.db')
+        connection = sqlite3.connect('../data.db')
         cursor = connection.cursor()
         query = "INSERT INTO items VALUES (?,?)"
         cursor.execute(query, (item['name'], item['price']))
@@ -46,7 +46,7 @@ class Item(Resource):
         connection.close()
 
     def delete(self, name):
-        connection = sqlite3.connect('data.db')
+        connection = sqlite3.connect('../data.db')
         cursor = connection.cursor()
         query = "DELETE FROM  items WHERE name=?"
         cursor.execute(query, (name,))
@@ -72,9 +72,22 @@ class Item(Resource):
 
     @classmethod
     def update(cls, item):
-        connection = sqlite3.connect('data.db')
+        connection = sqlite3.connect('../data.db')
         cursor = connection.cursor()
         query = "UPDATE items SET price=? WHERE name=?"
         cursor.execute(query, (item['price'], item['name']))
         connection.commit()
         connection.close()
+
+class ItemList(Resource):
+    def get(self):
+        connection = sqlite3.connect('../data.db')
+        cursor = connection.cursor()
+        query = "SELECT * FROM items "
+        result = cursor.execute(query)
+        items = []
+        for row in result:
+            items.append({'name': row[0], 'price': row[1]})
+
+        connection.close()
+        return {'items': items}
